@@ -29,7 +29,7 @@
               >{{ section }}</a
             >
             <a
-              href="#contact"
+              @click="scrollTo('contact')"
               class="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition duration-300"
               >Get Started</a
             >
@@ -57,7 +57,7 @@
           platforms.
         </p>
         <a
-          href="#contact"
+          @click="scrollTo('contact')"
           class="bg-white text-blue-600 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition duration-300"
           >Get a Quote</a
         >
@@ -85,7 +85,7 @@
               </li>
             </ul>
             <a
-              href="#contact"
+              @click="scrollTo('contact')"
               class="bg-blue-600 text-white px-6 py-3 rounded-full hover:bg-blue-700 transition duration-300"
               >Choose Plan</a
             >
@@ -115,7 +115,7 @@
               </li>
             </ul>
             <a
-              href="#contact"
+              @click="scrollTo('contact')"
               class="bg-blue-600 text-white px-6 py-3 rounded-full hover:bg-blue-700 transition duration-300"
               >Choose Plan</a
             >
@@ -223,6 +223,8 @@
 </template>
 
 <script>
+import emailjs from "emailjs-com";
+
 export default {
   data() {
     return {
@@ -231,7 +233,7 @@ export default {
         {
           name: "Basic",
           pages: "1-3 Pages",
-          price: "$300-$500",
+          price: "$295",
           features: [
             "Responsive Design",
             "SEO Optimization",
@@ -242,7 +244,7 @@ export default {
         {
           name: "Pro",
           pages: "5-7 Pages",
-          price: "$1000",
+          price: "$999",
           features: [
             "All Basic Features",
             "Custom Graphics",
@@ -253,7 +255,7 @@ export default {
         {
           name: "Elite",
           pages: "Webstores & Booking",
-          price: "$1500",
+          price: "$1499",
           features: [
             "All Pro Features",
             "E-commerce Functionality",
@@ -265,7 +267,7 @@ export default {
       hostingPlans: [
         {
           name: "Basic Hosting",
-          price: "$50/month",
+          price: "$49/month",
           features: [
             "Reliable Uptime",
             "SSL Certificate",
@@ -275,7 +277,7 @@ export default {
         },
         {
           name: "Pro Hosting",
-          price: "$100/month",
+          price: "$99/month",
           features: [
             "All Basic Features",
             "Quarterly Edits",
@@ -308,6 +310,10 @@ export default {
       },
     };
   },
+  mounted() {
+    // Initialize EmailJS with your User ID
+    emailjs.init("YOUR_USER_ID"); // Replace with your EmailJS User ID
+  },
   methods: {
     scrollTo(section) {
       const element = document.getElementById(section);
@@ -319,11 +325,35 @@ export default {
       }
     },
     submitForm() {
-      alert("Thank you for your message! We will get back to you soon.");
-      this.form = { name: "", email: "", message: "" };
+      if (!this.form.name || !this.form.email || !this.form.message) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
+      const templateParams = {
+        name: this.form.name,
+        email: this.form.email,
+        message: this.form.message,
+      };
+
+      emailjs
+        .send(
+          "service_48df8j9", // Replace with your EmailJS Service ID
+          "template_3encsi6", // Replace with your EmailJS Template ID
+          templateParams
+        )
+        .then(
+          (response) => {
+            console.log("SUCCESS!", response.status, response.text);
+            alert("Thank you for your message! We will get back to you soon.");
+            this.form = { name: "", email: "", message: "" };
+          },
+          (error) => {
+            console.log("FAILED...", error);
+            alert("Failed to send message. Please try again later.");
+          }
+        );
     },
   },
 };
 </script>
-
-<style></style>
